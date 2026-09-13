@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEFY STORE - ร้านค้าออนไลน์ & ระบบรีวิว (Dark Theme)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            950: '#050505',
+                            900: '#0c0c0e',
+                            800: '#141417',
+                            700: '#1e1e24',
+                            600: '#2a2a33',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #050505;
+            color: #f4f4f5;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Canvas for Smoke/Fog & Continuous Snow */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Black Aura Effect */
+        .black-aura {
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.95), 0 0 100px rgba(20, 20, 20, 0.8);
+        }
+        
+        .white-glow {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+        }
+
+        .white-glow-hover:hover {
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Aspect ratio 16:9 banner wrapper */
+        .aspect-banner {
+            aspect-ratio: 16 / 9;
+        }
+
+        /* Glassmorphic dark card styling */
+        .glass-card {
+            background: rgba(18, 18, 22, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Scrollbar customization */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+    </style>
+</head>
+<body class="bg-black text-zinc-100 min-h-screen pb-16 relative">
+
+    <!-- Background Canvas for Smoke/Fog & Snow Particle Animations -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Navigation Bar -->
+    <nav class="bg-zinc-950/90 border-b border-zinc-800/80 sticky top-0 z-30 backdrop-blur-md shadow-2xl">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-white text-black flex items-center justify-center font-bold text-lg shadow-lg shadow-white/10">
+                    <i class="fa-solid fa-store text-base"></i>
+                </div>
+                <span id="navStoreName" class="font-bold text-white tracking-wide text-lg">DEFY STORE</span>
+            </div>
+            
+            <button onclick="toggleAdminAuthModal()" id="adminToggleBtn" class="flex items-center space-x-2 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 text-zinc-300 transition duration-300 white-glow-hover">
+                <i class="fa-solid fa-user-shield text-zinc-400"></i>
+                <span id="adminBtnText">โหมดหลังบ้าน (Admin)</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 pt-6 relative z-10">
+        
+        <!-- Profile Banner Card with Black Aura -->
+        <div class="glass-card rounded-3xl shadow-2xl overflow-hidden mb-8 black-aura relative">
+            <!-- Dark Aura Radial Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black pointer-events-none z-10"></div>
+
+            <!-- Cover Photo -->
+            <div class="relative h-52 sm:h-72 bg-zinc-900 overflow-hidden">
+                <img id="coverImg" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop" 
+                     alt="Cover Photo" class="w-full h-full object-cover filter brightness-75 contrast-110">
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+            </div>
+
+            <!-- Profile Info Section -->
+            <div class="relative px-6 pb-6 pt-0 z-20">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between -mt-16 sm:-mt-20 mb-4 gap-4">
+                    <!-- Profile Avatar -->
+                    <div class="relative">
+                        <img id="profileImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop" 
+                             alt="Profile Avatar" class="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl border-2 border-zinc-700 object-cover shadow-2xl bg-zinc-900 ring-4 ring-black">
+                        <span class="absolute bottom-2 right-2 w-4 h-4 bg-emerald-500 border-2 border-black rounded-full shadow-lg" title="ออนไลน์"></span>
+                    </div>
+
+                    <!-- Overall Rating Summary -->
+                    <div class="flex items-center bg-zinc-900/90 border border-zinc-700/80 rounded-2xl px-4 py-2.5 self-start sm:self-end shadow-xl white-glow">
+                        <div class="text-white text-2xl font-extrabold mr-3 flex items-center">
+                            <i class="fa-solid fa-star text-amber-400 mr-1.5 text-xl"></i>
+                            <span id="avgRating">0.0</span>
+                        </div>
+                        <div class="text-xs text-zinc-400 border-l border-zinc-700 pl-3">
+                            <p class="font-medium text-zinc-200">คะแนนรีวิวร้านค้า</p>
+                            <p class="text-zinc-500"><span id="totalReviewsCount" class="text-white font-bold">0</span> รีวิวทั้งหมด</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Store Name and Description -->
+                <div>
+                    <h1 id="storeName" class="text-2xl sm:text-3xl font-extrabold text-white tracking-wide mb-1 flex items-center gap-2">
+                        <span>DEFY STORE</span>
+                        <i class="fa-solid fa-circle-check text-white text-base" title="ร้านค้าได้รับการยืนยันแล้ว"></i>
+                    </h1>
+                    <p id="storeDesc" class="text-zinc-400 text-sm sm:text-base leading-relaxed font-light max-w-2xl">
+                        ยินดีต้อนรับสู่ร้านค้าของเรา บริการด้วยความจริงใจ จำหน่ายไอเทมเกม สินค้าดิจิทัล และบริการเติมเกมตลอด 24 ชั่วโมง
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact & Payment Section (Grid Layout) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            
+            <!-- Contact Channels Card -->
+            <div class="glass-card rounded-3xl p-6 shadow-xl flex flex-col justify-between black-aura">
+                <div>
+                    <div class="flex items-center space-x-2.5 mb-5 border-b border-zinc-800 pb-3">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-800 text-white flex items-center justify-center border border-zinc-700">
+                            <i class="fa-solid fa-address-book text-sm"></i>
+                        </div>
+                        <h2 class="text-base font-bold text-white tracking-wide">ช่องทางการติดต่อ</h2>
+                    </div>
+
+                    <!-- Contact Items List -->
+                    <div class="space-y-3.5">
+                        <!-- LINE Contact -->
+                        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 transition duration-200">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-[#00B900]/20 border border-[#00B900]/40 text-[#00B900] flex items-center justify-center text-xl shadow-inner">
+                                    <i class="fa-brands fa-line"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">Line Official</span>
+                                    <span id="lineIdText" class="font-bold text-white text-sm">wjfigxddx</span>
+                                </div>
+                            </div>
+                            <button onclick="copyToClipboard('lineIdText', 'Line ID')" class="px-3.5 py-1.5 bg-white hover:bg-zinc-200 text-black text-xs font-bold rounded-xl transition duration-200 flex items-center space-x-1.5 shadow-md">
+                                <i class="fa-regular fa-copy"></i>
+                                <span>คัดลอก</span>
+                            </button>
+                        </div>
+
+                        <!-- Facebook Contact -->
+                        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 transition du
